@@ -11,14 +11,16 @@ const Cart = (props) => {
   );
 
   return (
-    <Modal>
+    <Modal onUnset={props.onUnset}>
       {cartItems}
       <div className={styles.total}>
         <span>Total Amount</span>
-        <span>53.99</span> 
+        <span>53.99</span>
       </div>
       <div className={styles.actions}>
-        <button className={styles['button--alt']}>Close</button>
+        <button className={styles['button--alt']} onClick={props.onUnset}>
+          Close
+        </button>
         <button className={styles.button}>Order</button>
       </div>
     </Modal>
