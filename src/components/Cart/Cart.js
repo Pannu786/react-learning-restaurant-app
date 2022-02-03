@@ -25,6 +25,13 @@ const Cart = (props) => {
     setIsCheckout(true);
   };
 
+  const submitOrderHandler = (userData) => {
+    fetch('https://first-fire-78e02-default-rtdb.firebaseio.com/oders.json', {
+      method: 'POST',
+      body: JSON.stringify({ user: userData, orderedItem: cartCtx.items }),
+    });
+  };
+
   const cartItems = (
     <ul className={styles['cart-items']}>
       {cartCtx.items.map((item) => (
@@ -60,7 +67,9 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      {isCheckout && <Checkout onCancel={props.onUnset} />}
+      {isCheckout && (
+        <Checkout onConfirm={submitOrderHandler} onCancel={props.onUnset} />
+      )}
       {!isCheckout && modalActions}
     </Modal>
   );
