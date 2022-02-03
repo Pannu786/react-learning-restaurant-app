@@ -9,6 +9,8 @@ import Checkout from './Checkout';
 const Cart = (props) => {
   const cartCtx = useContext(CartContext);
   const [isCheckout, setIsCheckout] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [didSubmit, setDidSubmit] = useState(false);
 
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
   const hasItems = cartCtx.items.length > 0;
@@ -25,11 +27,17 @@ const Cart = (props) => {
     setIsCheckout(true);
   };
 
-  const submitOrderHandler = (userData) => {
-    fetch('https://first-fire-78e02-default-rtdb.firebaseio.com/oders.json', {
-      method: 'POST',
-      body: JSON.stringify({ user: userData, orderedItem: cartCtx.items }),
-    });
+  const submitOrderHandler = async (userData) => {
+    setIsSubmitting(true);
+    await fetch(
+      'https://first-fire-78e02-default-rtdb.firebaseio.com/oders.json',
+      {
+        method: 'POST',
+        body: JSON.stringify({ user: userData, orderedItem: cartCtx.items }),
+      }
+    );
+    setIsSubmitting(false);
+    setDidSubmit(true);
   };
 
   const cartItems = (
@@ -60,8 +68,8 @@ const Cart = (props) => {
     </div>
   );
 
-  return (
-    <Modal onUnset={props.onUnset}>
+  const cartModalContent = (
+    <>
       {cartItems}
       <div className={styles.total}>
         <span>Total Amount</span>
@@ -71,8 +79,19 @@ const Cart = (props) => {
         <Checkout onConfirm={submitOrderHandler} onCancel={props.onUnset} />
       )}
       {!isCheckout && modalActions}
+    </>
+  );
+
+  const isSubmittingModalContent = <p>Sending order data...</p>;
+
+  const didSubmitModalContent = <p>Order sent!</p>;
+
+  return (
+    <Modal onUnset={props.onUnset}>
+      {!isSubmitting && !didSubmit && cartModalContent}
+      {isSubmitting && isSubmittingModalContent}
+      {!isSubmitting && didSubmit && didSubmitModalContent}
     </Modal>
   );
 };
-
 export default Cart;
